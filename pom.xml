@@ -1,0 +1,229 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.abvprp.core</groupId>
+  <artifactId>aboveproperty-war</artifactId>
+  <version>1</version>
+  <packaging>war</packaging>
+  <description>The most basic of Java WAR programs.</description>
+  <url>https://www.aboveproperty.com/</url>
+  <inceptionYear>2018</inceptionYear>
+  <profiles>
+    <profile>
+      <id>github</id>
+      <activation>
+        <property>
+          <name>useGitHubPackages</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>github</id>
+          <name>GitHub Packages</name>
+          <!-- GITHUB_REPOSITORY is set by the GitHub actions runner -->
+          <url>https://maven.pkg.github.com/${env.GITHUB_REPOSITORY}</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
+  <properties>
+    <git-changelog-maven-plugin.version>1.78</git-changelog-maven-plugin.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.owner>Above Property</project.owner>
+  </properties>
+
+  <dependencies>
+    <!-- Jakarta Servlets API -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>4.0.0</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+          <includeOnlyProperties>
+            <includeOnlyProperty>^git.build.(time|version|host)$</includeOnlyProperty>
+            <includeOnlyProperty>^git.tags$</includeOnlyProperty>
+            <includeOnlyProperty>^git.branch$</includeOnlyProperty>
+            <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+          </includeOnlyProperties>
+          <commitIdGenerationMode>full</commitIdGenerationMode>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.3.1</version>
+      </plugin>
+      <plugin>
+        <groupId>se.bjurr.gitchangelog</groupId>
+        <artifactId>git-changelog-maven-plugin</artifactId>
+        <version>${git-changelog-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>GenerateGitChangelog</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>git-changelog</goal>
+            </goals>
+            <configuration>
+              <file>target/CHANGELOG.md</file>
+              <fromCommit>0000000000000000000000000000000000000000</fromCommit>
+              <toRef>refs/remotes/origin/main</toRef>
+              <ignoreCommitsIfMessageMatches>^\\[maven-release-plugin\\].*|^\\[Gradle Release Plugin\\].*|^Merge.*</ignoreCommitsIfMessageMatches>
+              <noIssueName>Changes</noIssueName>
+              <untaggedName>Untagged</untaggedName>
+              <templateContent><![CDATA[
+# ${project.owner} ${project.artifactId} Change log
+{{#tags}}
+{{#ifReleaseTag .}}
+
+## [{{name}}](https://github.com/{{ownerName}}/{{repoName}}/releases/tag/{{name}}) ({{tagDate .}})
+  {{#ifContainsType commits type='feat'}}
+
+### Features
+
+    {{#commits}}
+      {{#ifCommitType . type='feat'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='fix'}}
+
+### Bug Fixes
+
+    {{#commits}}
+      {{#ifCommitType . type='fix'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='docs'}}
+
+### Documentation
+
+    {{#commits}}
+      {{#ifCommitType . type='docs'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='refactor'}}
+
+### Code Refactoring
+
+    {{#commits}}
+      {{#ifCommitType . type='refactor'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='perf'}}
+
+### Performance Improvements
+
+    {{#commits}}
+      {{#ifCommitType . type='perf'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='test'}}
+
+### tests
+
+    {{#commits}}
+      {{#ifCommitType . type='test'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='build'}}
+
+### Builds
+
+    {{#commits}}
+      {{#ifCommitType . type='build'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='ci'}}
+
+### Continuous Integration
+
+    {{#commits}}
+      {{#ifCommitType . type='ci'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='chore'}}
+
+### Chores
+
+    {{#commits}}
+      {{#ifCommitType . type='chore'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='revert'}}
+
+### Reverts
+
+    {{#commits}}
+      {{#ifCommitType . type='revert'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+  {{#ifContainsType commits type='style'}}
+
+### Styling
+
+    {{#commits}}
+      {{#ifCommitType . type='style'}}
+ - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{authorName}}] at {{commitTime}} [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+{{/ifReleaseTag}}
+{{/tags}}
+]]></templateContent>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <!-- The output .war file's name, which will be the name of the webapp. -->
+    <!-- <finalName>${project.artifactId}</finalName> -->
+  </build>
+</project>
