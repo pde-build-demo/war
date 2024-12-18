@@ -37,6 +37,8 @@
     <git-changelog-maven-plugin.version>1.78</git-changelog-maven-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.owner>Above Property</project.owner>
+    <maven.compiler.source>17</maven.compiler.source>
+     <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -78,7 +80,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.3.1</version>
+        <!-- <version>3.3.1</version> -->
       </plugin>
       <plugin>
         <groupId>se.bjurr.gitchangelog</groupId>
