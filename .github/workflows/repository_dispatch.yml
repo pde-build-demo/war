@@ -28,6 +28,9 @@ jobs:
       - run: echo ${{ github.event.client_payload.reports-version }}
 
   build_java:
+    defaults:
+      run:
+        working-directory: repos/java
     permissions:
       contents: write
       packages: write
