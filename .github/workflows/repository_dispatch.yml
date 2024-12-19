@@ -35,4 +35,6 @@ jobs:
       contents: write
       packages: write
       deployments: write
-    uses: pde-build-demo/java/.github/workflows/build.yml@main
+    steps:
+      - name: Build java repo
+        uses: pde-build-demo/java/.github/workflows/build.yml@main
