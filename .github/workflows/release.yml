@@ -52,17 +52,20 @@ jobs:
         distribution: zulu
         java-version: 17
 
-    - name: Deploy to GitHub maven repo
-      run: mvn --no-transfer-progress -Djgitver.use-version=${{ steps.changelog.outputs.version }} -DuseGitHubPackages=true clean deploy
+    - name: Deploy to local maven repo
+      run: mvn --no-transfer-progress -Djgitver.use-version=${{ steps.changelog.outputs.version }} clean install
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create a GitHub release
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: "target/*.war,target/CHANGELOG.md"
-        tag: ${{ steps.changelog.outputs.tag }}
-        name: Release ${{ steps.changelog.outputs.version }}
-        body: ${{ steps.changelog.outputs.clean_changelog }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+#
+# Do we really need to do this outside of the main build workflow?
+#
+    # - name: Create a GitHub release
+    #   uses: ncipollo/release-action@v1
+    #   with:
+    #     artifacts: "target/*.war,target/CHANGELOG.md"
+    #     tag: ${{ steps.changelog.outputs.tag }}
+    #     name: Release ${{ steps.changelog.outputs.version }}
+    #     body: ${{ steps.changelog.outputs.clean_changelog }}
+    #     token: ${{ secrets.GITHUB_TOKEN }}
 

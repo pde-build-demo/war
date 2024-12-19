@@ -21,7 +21,15 @@ jobs:
           elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "Manual trigger" >> $GITHUB_STEP_SUMMARY
           fi
-  build-the-war:
+
+  echo-the-deets:
     runs-on: ubuntu-latest
     steps:
       - run: echo ${{ github.event.client_payload.reports-version }}
+
+  build_java:
+    permissions:
+      contents: write
+      packages: write
+      deployments: write
+    uses: pde-build-demo/java/.github/workflows/build.yml@main
