@@ -29,9 +29,9 @@ jobs:
 
   build_java:
     uses: pde-build-demo/java/.github/workflows/build.yml@main
-    defaults:
-      run:
-        working-directory: repos/java
+    # defaults:
+    #   run:
+    #     working-directory: repos/java
     permissions:
       contents: write
       packages: write
