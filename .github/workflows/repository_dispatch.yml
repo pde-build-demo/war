@@ -28,6 +28,7 @@ jobs:
       - run: echo ${{ github.event.client_payload.reports-version }}
 
   build_java:
+    uses: pde-build-demo/java/.github/workflows/build.yml@main
     defaults:
       run:
         working-directory: repos/java
@@ -35,6 +36,5 @@ jobs:
       contents: write
       packages: write
       deployments: write
-    steps:
-      - name: Build java repo
-        uses: pde-build-demo/java/.github/workflows/build.yml@main
+
+
